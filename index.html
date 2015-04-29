@@ -10,12 +10,16 @@
     <img id="logo" src='https://raw.github.com/codebar/planner/master/app/assets/images/logo.png' width='200' />
     </header>
     <div id="container">
+      <div style="float:left">
+         <!-- man -->  
+      <canvas id="canvas-id" width="400" height="500" style="margin-top:-80px"></canvas>
+      </div>
       <div class="board">
         <div class="hangman-word"> 
           <!-- display returned hangman string -->
         </div>
         <div class="remaining-guesses">
-          <span class="remaining">7 <!-- don't forget to update! --> </span> guesses left
+          <span class="remaining">10 <!-- don't forget to update! --> </span> guesses left
         </div>
 
         <div class="console">
@@ -31,6 +35,8 @@
         <button id="new-game">Start a new game</button>
       </div>
       <br/>
+
+     
 
     </div>
     <footer>

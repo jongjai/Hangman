@@ -1,4 +1,6 @@
 /** Hangman **/
+
+
 function newGame(){
   $(".attempts span").remove();
   $.ajax({
@@ -8,51 +10,67 @@ function newGame(){
     $("#new-game").hide();
     $(".token").text(data.token);
     $(".hangman-word").text(data.hangman);
+
   }).fail(function(data){
     debugger
   })
 };
 
 function guess(letter){
-  $.ajax({
-    type: "PUT",
-    url: "http://hangman-api.herokuapp.com/hangman",
-    dataType: "json",
-    data: { "token" : $(".token").text(), "letter" : letter },
-  }).done(function(data){
+var canvas = document.getElementById('canvas-id');
+var c = canvas.getContext("2d");
+
+  c.strokeStyle = "#000";
+  c.lineWidth = 10;
+
+
+ if($.isNumeric(letter) || $.trim(letter).length == 0){
+  //if($.isNumeric(letter)){
+    alert("Please, not a number or space");
+    $(".letter").val("");
+  }else{
+    $.ajax({
+      type: "PUT",
+      url: "http://hangman-api.herokuapp.com/hangman",
+      dataType: "json",
+      data: { "token" : $(".token").text(), "letter" : letter },
+    }).done(function(data){
     
-    if(data.correct){ // if the letter guess is correct
-      $(".hangman-word").text(data.hangman);
-      $(".token").text(data.token);
-      $(".letter").val("");
-        
-        if(data.hangman.indexOf("_") == -1){
-          alert("Win!!");
-          $("#new-game").show();
-          $(".console").hide();
-          $(".attempts span").remove();
-        }else{
-         $(".attempts").append("<span>" + letter + " </span>");
-        }
-    }else{
+      if(data.correct){ // if the letter guess is correct
         $(".hangman-word").text(data.hangman);
         $(".token").text(data.token);
         $(".letter").val("");
-        $(".attempts").append("<span class='wrong'>" + letter + " </span>");
-        var counting = $(".wrong").length+1;
-        console.log(counting);
-        $(".remaining").text(8 - counting);
+          
+          if(data.hangman.indexOf("_") == -1){
+            alert("Win!!");
+            $("#new-game").show();
+            $(".console").hide();
+            $(".attempts span").remove();
+          }else{
+           $(".attempts").append("<span>" + letter.toLowerCase() + " </span>");
+          }
+      }else{
+          $(".hangman-word").text(data.hangman);
+          $(".token").text(data.token);
+          $(".letter").val("");
+          $(".attempts").append("<span class='wrong'>" + letter.toLowerCase() + " </span>");
+          var counting = $(".wrong").length+1;
+          console.log(counting);
+          $(".remaining").text(11 - counting);
 
-        if(counting > 7){
-          showAnswer();
-          alert("Lose!!");
-          $("#new-game").show();
-          $(".console").hide();
-        }
-    }
-  }).fail(function(data){
-    debugger
-  })
+          draw(c, counting);
+
+          if(counting > 10){
+            showAnswer();
+            alert("Lose!!");
+            $("#new-game").show();
+            $(".console").hide();
+          }
+      }
+    }).fail(function(data){
+      debugger
+    });
+  }
 }
 
 function showAnswer(){
@@ -83,7 +101,99 @@ function showAnswer(){
   })
 }
 
+
+/** Canvas playground for Codebar's tutorial Drawing in Canvas **/
+
+function draw(c, counting) {
+c.strokeStyle = "#000";
+
+
+ switch (counting) {
+
+  case 2://base
+    c.lineWidth = 10;
+    c.moveTo(20,400);
+    c.lineTo(280,400);
+    c.stroke();
+  break;
+
+  case 3://stand
+    c.moveTo(50,400);
+    c.lineTo(50,50);
+    c.stroke();
+  break;
+
+  case 4://
+    c.moveTo(45,50);
+    c.lineTo(200,50);
+    c.stroke();
+  break;
+
+  case 5: // robe
+    c.moveTo(200,45);
+    c.lineTo(200,100);
+    c.stroke();
+  break;
+
+  case 6: // head
+    c.lineWidth = 4;
+    c.translate(200,150);
+    circle(c);
+  break;
+
+  case 7: // body
+  c.lineWidth = 4;
+    c.moveTo(0,50);
+    c.lineTo(0,150);
+    c.stroke();
+  break;
+
+  case 8: // left arm
+    c.lineWidth = 4;
+    c.moveTo(0,50);
+    c.lineTo(-80,100);
+    c.stroke();
+  break;
+
+  case 9: // right arm
+  c.lineWidth = 4;
+  c.moveTo(0,50);
+  c.lineTo(80,100);
+  c.stroke();
+  break;
+
+  case 10:// left leg
+  c.lineWidth = 4;
+  c.moveTo(0,150);
+  c.lineTo(-80,200);
+  c.stroke();
+  
+  break;
+
+  case 11:// right leg
+  c.lineWidth = 4;
+  c.moveTo(0,150);
+  c.lineTo(80,200);
+  c.stroke();
+  break;
+
+ }
+ return;
+ 
+}
+function circle(c){
+  c.beginPath();
+  c.arc(0, 0, 50, 0, Math.PI*2, true);
+  c.closePath();
+  c.stroke();
+}
+
+
 $(document).ready(function(){
+
+ // var canvas = document.getElementById('canvas-id');
+ // var c = canvas.getContext("2d");
+
   newGame();
 
   $(document).on("submit", "#form-game", function(event){
@@ -95,8 +205,13 @@ $(document).ready(function(){
   $(document).on("click", "#new-game", function(){
     newGame();
     $(".console").show();
+    $(".remaining").text(10);
+    var canvas = document.getElementById('canvas-id');
+    var c = canvas.getContext("2d");
+    canvas.width = canvas.width;
   });
 
+  
 });
 
 
